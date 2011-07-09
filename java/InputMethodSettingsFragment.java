@@ -16,6 +16,7 @@
 package com.android.inputmethodcommon;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -54,23 +55,27 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment {
         final InputMethodManager imm =
                 (InputMethodManager) context.getSystemService(
                         Context.INPUT_METHOD_SERVICE);
-
         final InputMethodInfo imi = getMyImi(imm);
         if (imi != null && imi.getSubtypeCount() > 1) {
             mInputMethodSettingsCategory = new PreferenceCategory(context);
-            mSubtypeEnablerPreference =
-                    getPreferenceManager().createPreferenceScreen(context);
+            mSubtypeEnablerPreference = new Preference(context);
             mSubtypeEnablerPreference
                     .setOnPreferenceClickListener(new OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
-                            final Bundle bundle = new Bundle();
-                            bundle.putString(Settings.EXTRA_INPUT_METHOD_ID, imi.getId());
+                            final Intent intent = new Intent(
+                                    Settings.ACTION_INPUT_METHOD_SUBTYPE_SETTINGS);
+                            intent.putExtra(Settings.EXTRA_INPUT_METHOD_ID, imi.getId());
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+                                    | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
                             return true;
                         }
                     });
-            mInputMethodSettingsCategory.addPreference(mSubtypeEnablerPreference);
+            setPreferenceScreen(getPreferenceManager().createPreferenceScreen(context));
             getPreferenceScreen().addPreference(mInputMethodSettingsCategory);
+            mInputMethodSettingsCategory.addPreference(mSubtypeEnablerPreference);
         }
         updateSubtypeEnabler();
     }
