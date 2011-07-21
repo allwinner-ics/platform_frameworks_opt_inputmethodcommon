@@ -61,9 +61,13 @@ import java.util.List;
                 .setOnPreferenceClickListener(new OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
+                        final CharSequence title = getSubtypeEnablerTitle(context);
                         final Intent intent =
                                 new Intent(Settings.ACTION_INPUT_METHOD_SUBTYPE_SETTINGS);
                         intent.putExtra(Settings.EXTRA_INPUT_METHOD_ID, imi.getId());
+                        if (!TextUtils.isEmpty(title)) {
+                            intent.putExtra(Intent.EXTRA_TITLE, title);
+                        }
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                                 | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
                                 | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -162,6 +166,14 @@ import java.util.List;
         mSubtypeEnablerIconRes = 0;
         mSubtypeEnablerIcon = drawable;
         updateSubtypeEnabler();
+    }
+
+    private CharSequence getSubtypeEnablerTitle(Context context) {
+        if (mSubtypeEnablerTitleRes != 0) {
+            return context.getString(mSubtypeEnablerTitleRes);
+        } else {
+            return mSubtypeEnablerTitle;
+        }
     }
 
     private void updateSubtypeEnabler() {
