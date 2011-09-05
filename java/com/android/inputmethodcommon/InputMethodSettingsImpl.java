@@ -31,7 +31,6 @@ import android.view.inputmethod.InputMethodManager;
 import java.util.List;
 
 /* package private */ class InputMethodSettingsImpl implements InputMethodSettingsInterface {
-    private PreferenceCategory mInputMethodSettingsCategory;
     private Preference mSubtypeEnablerPreference;
     private int mInputMethodSettingsCategoryTitleRes;
     private CharSequence mInputMethodSettingsCategoryTitle;
@@ -55,7 +54,6 @@ import java.util.List;
         if (imi == null || imi.getSubtypeCount() <= 1) {
             return false;
         }
-        mInputMethodSettingsCategory = new PreferenceCategory(context);
         mSubtypeEnablerPreference = new Preference(context);
         mSubtypeEnablerPreference
                 .setOnPreferenceClickListener(new OnPreferenceClickListener() {
@@ -75,8 +73,7 @@ import java.util.List;
                         return true;
                     }
                 });
-        prefScreen.addPreference(mInputMethodSettingsCategory);
-        mInputMethodSettingsCategory.addPreference(mSubtypeEnablerPreference);
+        prefScreen.addPreference(mSubtypeEnablerPreference);
         updateSubtypeEnabler();
         return true;
     }
@@ -192,13 +189,6 @@ import java.util.List;
                 mSubtypeEnablerPreference.setIcon(mSubtypeEnablerIconRes);
             } else if (mSubtypeEnablerIcon != null) {
                 mSubtypeEnablerPreference.setIcon(mSubtypeEnablerIcon);
-            }
-        }
-        if (mInputMethodSettingsCategory != null) {
-            if (mInputMethodSettingsCategoryTitleRes != 0) {
-                mInputMethodSettingsCategory.setTitle(mInputMethodSettingsCategoryTitleRes);
-            } else if (!TextUtils.isEmpty(mInputMethodSettingsCategoryTitle)) {
-                mInputMethodSettingsCategory.setTitle(mInputMethodSettingsCategoryTitle);
             }
         }
     }
