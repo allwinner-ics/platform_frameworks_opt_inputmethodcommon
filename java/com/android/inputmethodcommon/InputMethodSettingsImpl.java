@@ -21,12 +21,12 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.view.inputmethod.InputMethodSubtype;
 
 import java.util.List;
 
@@ -36,10 +36,11 @@ import java.util.List;
     private CharSequence mInputMethodSettingsCategoryTitle;
     private int mSubtypeEnablerTitleRes;
     private CharSequence mSubtypeEnablerTitle;
-    private int mSubtypeEnablerSummaryRes;
-    private CharSequence mSubtypeEnablerSummary;
     private int mSubtypeEnablerIconRes;
     private Drawable mSubtypeEnablerIcon;
+    private InputMethodManager mImm;
+    private InputMethodInfo mImi;
+    private Context mContext;
 
     /**
      * Initialize internal states of this object.
@@ -48,10 +49,10 @@ import java.util.List;
      * @return true if this application is an IME and has two or more subtypes, false otherwise.
      */
     public boolean init(final Context context, final PreferenceScreen prefScreen) {
-        final InputMethodManager imm =
-                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        final InputMethodInfo imi = getMyImi(context, imm);
-        if (imi == null || imi.getSubtypeCount() <= 1) {
+        mContext = context;
+        mImm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        mImi = getMyImi(context, mImm);
+        if (mImi == null || mImi.getSubtypeCount() <= 1) {
             return false;
         }
         mSubtypeEnablerPreference = new Preference(context);
@@ -62,7 +63,7 @@ import java.util.List;
                         final CharSequence title = getSubtypeEnablerTitle(context);
                         final Intent intent =
                                 new Intent(Settings.ACTION_INPUT_METHOD_SUBTYPE_SETTINGS);
-                        intent.putExtra(Settings.EXTRA_INPUT_METHOD_ID, imi.getId());
+                        intent.putExtra(Settings.EXTRA_INPUT_METHOD_ID, mImi.getId());
                         if (!TextUtils.isEmpty(title)) {
                             intent.putExtra(Intent.EXTRA_TITLE, title);
                         }
@@ -89,6 +90,22 @@ import java.util.List;
         return null;
     }
 
+    private static String getEnabledSubtypesLabel(
+            Context context, InputMethodManager imm, InputMethodInfo imi) {
+        if (context == null || imm == null || imi == null) return null;
+        final List<InputMethodSubtype> subtypes = imm.getEnabledInputMethodSubtypeList(imi, true);
+        final StringBuilder sb = new StringBuilder();
+        final int N = subtypes.size();
+        for (int i = 0; i < N; ++i) {
+            final InputMethodSubtype subtype = subtypes.get(i);
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(subtype.getDisplayName(context, imi.getPackageName(),
+                    imi.getServiceInfo().applicationInfo));
+        }
+        return sb.toString();
+    }
     /**
      * {@inheritDoc}
      */
@@ -131,25 +148,6 @@ import java.util.List;
      * {@inheritDoc}
      */
     @Override
-    public void setSubtypeEnablerSummary(int resId) {
-        mSubtypeEnablerSummaryRes = resId;
-        updateSubtypeEnabler();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSubtypeEnablerSummary(CharSequence summary) {
-        mSubtypeEnablerSummaryRes = 0;
-        mSubtypeEnablerSummary = summary;
-        updateSubtypeEnabler();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setSubtypeEnablerIcon(int resId) {
         mSubtypeEnablerIconRes = resId;
         updateSubtypeEnabler();
@@ -173,17 +171,16 @@ import java.util.List;
         }
     }
 
-    private void updateSubtypeEnabler() {
+    public void updateSubtypeEnabler() {
         if (mSubtypeEnablerPreference != null) {
             if (mSubtypeEnablerTitleRes != 0) {
                 mSubtypeEnablerPreference.setTitle(mSubtypeEnablerTitleRes);
             } else if (!TextUtils.isEmpty(mSubtypeEnablerTitle)) {
                 mSubtypeEnablerPreference.setTitle(mSubtypeEnablerTitle);
             }
-            if (mSubtypeEnablerSummaryRes != 0) {
-                mSubtypeEnablerPreference.setSummary(mSubtypeEnablerSummaryRes);
-            } else if (!TextUtils.isEmpty(mSubtypeEnablerSummary)) {
-                mSubtypeEnablerPreference.setSummary(mSubtypeEnablerSummary);
+            final String summary = getEnabledSubtypesLabel(mContext, mImm, mImi);
+            if (!TextUtils.isEmpty(summary)) {
+                mSubtypeEnablerPreference.setSummary(summary);
             }
             if (mSubtypeEnablerIconRes != 0) {
                 mSubtypeEnablerPreference.setIcon(mSubtypeEnablerIconRes);

@@ -16,8 +16,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := inputmethod-common
-# TODO: Change a sdk version to 14 once the framework gets ready
-LOCAL_SDK_VERSION := 13
+LOCAL_SDK_VERSION := current
 LOCAL_SRC_FILES := \
      $(call all-java-files-under, java)
 include $(BUILD_STATIC_JAVA_LIBRARY)

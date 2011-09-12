@@ -50,20 +50,6 @@ public interface InputMethodSettingsInterface {
     public void setSubtypeEnablerTitle(CharSequence title);
 
     /**
-     * Sets the summary for the inputmethod enabler preference for launching subtype enabler with a
-     * resource ID.
-     * @param resId The resource id of the summary for the preference.
-     */
-    public void setSubtypeEnablerSummary(int resId);
-
-    /**
-     * Sets the summary for the inputmethod enabler preference for launching subtype enabler with a
-     * CharSequence.
-     * @param summary The summary of the preference.
-     */
-    public void setSubtypeEnablerSummary(CharSequence summary);
-
-    /**
      * Sets the icon for the preference for launching subtype enabler with a resource ID.
      * @param resId The resource id of an optional icon for the preference.
      */

@@ -72,22 +72,6 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment
      * {@inheritDoc}
      */
     @Override
-    public void setSubtypeEnablerSummary(int resId) {
-        mSettings.setSubtypeEnablerSummary(resId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSubtypeEnablerSummary(CharSequence summary) {
-        mSettings.setSubtypeEnablerSummary(summary);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setSubtypeEnablerIcon(int resId) {
         mSettings.setSubtypeEnablerIcon(resId);
     }
@@ -98,5 +82,14 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment
     @Override
     public void setSubtypeEnablerIcon(Drawable drawable) {
         mSettings.setSubtypeEnablerIcon(drawable);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSettings.updateSubtypeEnabler();
     }
 }
